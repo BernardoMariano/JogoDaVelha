@@ -1,0 +1,102 @@
+CTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+    <title>Jogo da Velha</title>
+    <style>
+    table tr td {
+        width: 50px;
+        height: 50px;
+        border: 1px solid #000;
+        text-align: center;
+        font-family: verdana;
+        font-size: 28px;
+    }
+    </style>
+</head>
+<body>
+    <div id="jogo"></div>
+<script>
+function JogoDaVelha () {
+    this.self = document.querySelector(arguments[0]);
+    this.init();
+}
+ 
+JogoDaVelha.prototype.init = function () {
+    this.prepareVector()
+        .generateTable()
+        .bindEvents()
+        .beginGame();
+}
+ 
+JogoDaVelha.prototype.prepareVector = function () {
+    this.gameVector = [];
+    var i;
+    for (i = 0; i <= 2; i++) {
+        this.gameVector[i] = [];
+        for (j = 0; j <= 2; j++) {
+            this.gameVector[i][j] = '';
+        }
+    }
+    return this;
+}
+ 
+JogoDaVelha.prototype.generateTable = function () {
+    var i,
+        j,
+        html = '<table>';
+    for (i = 0; i <= 2; i++) {
+        html += '<tr>';
+        for (j = 0; j <= 2; j++) {
+            html += '<td class="game-cell"\
+                        data-x="' + i + '"\
+                        data-y="' + j + '">\
+                    </td>';
+        }
+        html += '</tr>';
+    }
+    html += '</table>';
+    this.self.innerHTML = html;
+    return this;
+}
+ 
+JogoDaVelha.prototype.bindEvents = function () {
+    var i,
+        self = this;
+    var gameCell = document.querySelectorAll('td.game-cell');
+    for (i = 0, len = gameCell.length; i < len; i++) {
+        gameCell[i].addEventListener('click', function () {
+            return self.setCellValue(this.getAttribute('data-x'),
+                                     this.getAttribute('data-y'));
+        });
+    }
+    return this;
+}
+ 
+JogoDaVelha.prototype.setCellValue = function (x, y) {
+    if (this.gameVector[x][y] == '') {
+        this.gameVector[x][y] = this.currentTurn;
+        this.getGameCell(x, y).innerHTML = this.GUIValues[this.currentTurn];
+        this.switchTurn();
+    }
+    return this;
+}
+ 
+JogoDaVelha.prototype.getGameCell = function (x, y) {
+    return document.querySelector('td[data-x="' + x + '"][data-y="' + y + '"]');
+}
+ 
+JogoDaVelha.prototype.switchTurn = function () {
+    this.currentTurn = 1 - this.currentTurn;
+}
+ 
+JogoDaVelha.prototype.beginGame = function () {
+    this.currentTurn = 1;
+    this.GUIValues = ['O', 'X'];
+}
+ 
+var Jogo = new JogoDaVelha('#jogo');
+</script>
+</body>
+</html>
+
