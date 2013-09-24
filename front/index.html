@@ -4,9 +4,13 @@
   <meta charset="utf-8">
     <title>Jogo da Velha</title>
     <style>
+    table {
+        width: 100%;
+        height: 100%;
+    }
     table tr td {
-        width: 50px;
-        height: 50px;
+        width: 33%;
+        height: 33%;
         border: 1px solid #000;
         text-align: center;
         font-family: verdana;
@@ -23,6 +27,9 @@ function JogoDaVelha () {
 }
  
 JogoDaVelha.prototype.init = function () {
+    this.gameRunning = false;
+    this.gameVector = [];
+    this.GUIValues = ['O', 'X'];
     this.prepareVector()
         .generateTable()
         .bindEvents()
@@ -30,7 +37,8 @@ JogoDaVelha.prototype.init = function () {
 }
  
 JogoDaVelha.prototype.prepareVector = function () {
-    this.gameVector = [];
+    // Cria um vetor que armazenará a marcação
+    // de cada célula do jogo.
     var i;
     for (i = 0; i <= 2; i++) {
         this.gameVector[i] = [];
@@ -42,6 +50,7 @@ JogoDaVelha.prototype.prepareVector = function () {
 }
  
 JogoDaVelha.prototype.generateTable = function () {
+    // Gera a tabela e escreve na página.
     var i,
         j,
         html = '<table>';
@@ -61,20 +70,28 @@ JogoDaVelha.prototype.generateTable = function () {
 }
  
 JogoDaVelha.prototype.bindEvents = function () {
+    // Registra os eventos de clique nas células, primeiro
+    // coloca o valor e depois checa a tabela.
     var i,
-        self = this;
-    var gameCell = document.querySelectorAll('td.game-cell');
-    for (i = 0, len = gameCell.length; i < len; i++) {
-        gameCell[i].addEventListener('click', function () {
-            return self.setCellValue(this.getAttribute('data-x'),
-                                     this.getAttribute('data-y'));
-        });
+        self = this,
+        gameCell = this.self.querySelectorAll('td.game-cell'),
+        len = gameCell.length;
+    for (i = 0; i < len; i++) {
+        gameCell[i].onclick = function () {
+            if (self.gameRunning) {
+                self.setCellValue(this.getAttribute('data-x'),
+                                  this.getAttribute('data-y'));
+                self.checkGrid();
+            }
+        };
     }
     return this;
 }
  
 JogoDaVelha.prototype.setCellValue = function (x, y) {
-    if (this.gameVector[x][y] == '') {
+    // Insere um valor no vetor x, y e seu símbolo na
+    // célula se ela estiver vazia, depois troca o turno.
+    if (this.gameVector[x][y] === '') {
         this.gameVector[x][y] = this.currentTurn;
         this.getGameCell(x, y).innerHTML = this.GUIValues[this.currentTurn];
         this.switchTurn();
@@ -83,18 +100,57 @@ JogoDaVelha.prototype.setCellValue = function (x, y) {
 }
  
 JogoDaVelha.prototype.getGameCell = function (x, y) {
-    return document.querySelector('td[data-x="' + x + '"][data-y="' + y + '"]');
+    // Retorna a célula desejada.
+    return this.self.querySelector('td[data-x="' + x + '"][data-y="' + y + '"]');
 }
  
 JogoDaVelha.prototype.switchTurn = function () {
+    // Troca o turno, se for 0 fica 1, se for 1 fica 0.
     this.currentTurn = 1 - this.currentTurn;
+}
+
+JogoDaVelha.prototype.checkGrid = function () {
+    // Checa a tabela procurando por matches,
+    // primeiro as linhas e depois as colunas.
+    var i,
+        j,
+        winner = -1;
+    for (i = 0; i <= 2; i++) {
+        winner = this.checkLine(i);
+        if (winner >= 0) {
+            this.gameRunning = false;
+            alert(this.GUIValues[winner / 3] + ' won!');
+        } else {
+            // winner = this.checkColumn(i);
+            // if (winner >= 0)
+        }
+    }
+}
+
+JogoDaVelha.prototype.checkLine = function (line) {
+    // Recebe uma linha e retorna a soma dos valores
+    // de cada célula daquela linha, se o total for 0,
+    // retorna 0, se for 3 retorna 3, senão retorna -1.
+    if (line >= 0) {
+        var i,
+            sum = 0;
+        for (i = 0; i <= 2; i++) {
+            if (this.gameVector[line][i] !== '') {
+                sum += this.gameVector[line][i];
+            } else {
+                return -1;
+            }
+        }
+        return [0, 3].indexOf(sum) * 3;
+    }
+    return -1;
 }
  
 JogoDaVelha.prototype.beginGame = function () {
+    // Inicia a partida.
     this.currentTurn = 1;
-    this.GUIValues = ['O', 'X'];
+    this.gameRunning = true;
 }
- 
 var Jogo = new JogoDaVelha('#jogo');
 </script>
 </body>
