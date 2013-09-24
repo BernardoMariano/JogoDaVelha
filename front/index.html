@@ -119,7 +119,7 @@ JogoDaVelha.prototype.checkGrid = function () {
         winner = this.checkLine(i);
         if (winner >= 0) {
             this.gameRunning = false;
-            alert(this.GUIValues[winner / 3] + ' won!');
+            alert(this.GUIValues[winner] + ' won!');
         } else {
             // winner = this.checkColumn(i);
             // if (winner >= 0)
@@ -141,7 +141,7 @@ JogoDaVelha.prototype.checkLine = function (line) {
                 return -1;
             }
         }
-        return [0, 3].indexOf(sum) * 3;
+        return [0, 3].indexOf(sum);
     }
     return -1;
 }
